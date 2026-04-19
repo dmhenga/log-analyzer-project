@@ -1,0 +1,78 @@
+2026-04-09 06:15:22,001 INFO     [main] Application starting up — version 3.14.2
+2026-04-09 06:15:22,050 DEBUG    [main] Loading configuration from /etc/myapp/config.yaml
+2026-04-09 06:15:22,112 DEBUG    [main] Database host: db.internal:5432
+2026-04-09 06:15:22,200 INFO     [main] Connected to PostgreSQL database (pool size=10)
+2026-04-09 06:15:22,205 INFO     [main] Cache layer initialized (Redis 7.0 @ 10.0.0.8:6379)
+2026-04-09 06:15:22,210 INFO     [main] HTTP server listening on 0.0.0.0:8080
+2026-04-09 07:30:45,000 DEBUG    [worker-1] Worker thread started
+2026-04-09 07:30:45,001 DEBUG    [worker-2] Worker thread started
+2026-04-09 07:30:45,002 DEBUG    [worker-3] Worker thread started
+2026-04-09 07:30:45,003 DEBUG    [worker-4] Worker thread started
+2026-04-09 08:45:12,500 INFO     [request-101] GET /api/users -> 200 (12ms)
+2026-04-09 08:45:12,600 INFO     [request-102] POST /api/users -> 201 (34ms)
+2026-04-09 08:45:12,700 DEBUG    [request-102] Inserted user id=5042 into users table
+2026-04-09 09:22:33,000 WARNING  [request-103] POST /api/orders -> 422: missing required field 'shipping_address'
+2026-04-09 09:22:33,100 INFO     [request-104] GET /api/orders -> 200 (9ms)
+2026-04-09 10:10:55,000 ERROR    [request-105] GET /api/inventory -> Database query timeout after 5000ms
+2026-04-09 10:10:55,010 ERROR    [request-105] Stack trace:
+  at db.query (/app/lib/db.js:88)
+  at InventoryService.getAll (/app/services/inventory.js:22)
+  at router.get (/app/routes/inventory.js:10)
+2026-04-09 10:10:55,020 INFO     [request-105] GET /api/inventory -> 500 (5012ms)
+2026-04-09 11:05:18,000 WARNING  [db-pool] Connection pool utilization at 90% (9/10 connections in use)
+2026-04-09 11:05:18,100 INFO     [request-106] GET /api/inventory -> 200 (22ms)
+2026-04-09 12:30:42,000 DEBUG    [scheduler] Running scheduled job: cleanup_expired_sessions
+2026-04-09 12:30:42,250 INFO     [scheduler] Deleted 142 expired sessions
+2026-04-09 13:45:27,000 WARNING  [cache] Cache miss rate for /api/products exceeded 40% threshold (current: 43.2%)
+2026-04-09 13:45:27,100 INFO     [request-210] GET /api/products -> 200 (88ms, cache miss)
+2026-04-09 13:45:27,200 INFO     [request-211] GET /api/products -> 200 (4ms, cache hit)
+2026-04-09 13:45:27,300 INFO     [request-212] GET /api/products -> 200 (3ms, cache hit)
+2026-04-09 14:12:08,000 ERROR    [auth] Failed login attempt for user 'admin' from 10.0.0.99 (attempt 3/5)
+2026-04-09 14:12:08,100 ERROR    [auth] Failed login attempt for user 'admin' from 10.0.0.99 (attempt 4/5)
+2026-04-09 14:12:08,200 ERROR    [auth] Failed login attempt for user 'admin' from 10.0.0.99 (attempt 5/5)
+2026-04-09 14:12:08,300 WARNING  [auth] Account 'admin' temporarily locked after 5 failed attempts
+2026-04-09 14:12:08,400 WARNING  [security] Brute-force pattern detected from 10.0.0.99 — rate-limiting applied
+2026-04-09 15:55:33,000 INFO     [request-300] GET /api/report -> 200 (1402ms)
+2026-04-09 16:20:44,000 CRITICAL [db] Lost connection to primary database db.internal:5432
+2026-04-09 16:20:44,100 CRITICAL [db] Failing over to standby database db-standby.internal:5432
+2026-04-09 16:20:44,500 INFO     [db] Successfully connected to standby database
+2026-04-09 16:20:44,600 WARNING  [db] Operating in read-only mode until primary is restored
+2026-04-09 17:40:15,000 ERROR    [request-401] POST /api/users -> Cannot execute write on read-only database
+2026-04-09 17:40:15,100 INFO     [request-401] POST /api/users -> 503 (5ms)
+2026-04-09 17:40:15,200 ERROR    [request-402] POST /api/orders -> Cannot execute write on read-only database
+2026-04-09 17:40:15,300 INFO     [request-402] POST /api/orders -> 503 (4ms)
+2026-04-09 18:15:26,000 INFO     [db] Primary database connection restored
+2026-04-09 18:15:26,050 INFO     [db] Switched back to primary database db.internal:5432
+2026-04-09 18:15:26,100 INFO     [db] Write operations resumed
+2026-04-09 19:30:57,000 DEBUG    [scheduler] Running scheduled job: generate_daily_report
+2026-04-09 19:30:57,500 INFO     [scheduler] Daily report generated (2.3MB) and saved to /var/reports/2026-04-09.pdf
+2026-04-09 20:45:12,000 WARNING  [memory] Heap usage at 78% (1567MB / 2048MB)
+2026-04-09 20:45:12,100 DEBUG    [gc] Running full GC cycle
+2026-04-10 06:25:39,000 INFO     [main] Application starting up — version 3.14.2
+2026-04-10 07:40:51,000 DEBUG    [main] Loading configuration from /etc/myapp/config.yaml
+2026-04-10 08:55:17,000 INFO     [request-500] GET /api/users -> 200 (15ms)
+2026-04-10 09:30:33,000 WARNING  [request-501] POST /api/orders -> 422: invalid payment method
+2026-04-10 10:45:49,000 ERROR    [request-502] GET /api/payments -> Database connection failed
+2026-04-10 11:20:05,000 INFO     [request-503] GET /api/products -> 200 (45ms)
+2026-04-10 12:35:22,000 DEBUG    [scheduler] Running scheduled job: update_product_cache
+2026-04-10 13:50:38,000 INFO     [scheduler] Product cache updated (1250 items)
+2026-04-10 14:15:44,000 WARNING  [cache] Cache hit rate dropped to 65%
+2026-04-10 15:30:56,000 ERROR    [auth] Invalid JWT token from 192.168.1.100
+2026-04-10 16:45:12,000 INFO     [request-600] POST /api/auth/refresh -> 200 (8ms)
+2026-04-10 17:20:28,000 DEBUG    [worker-5] Background job completed: email_notifications
+2026-04-10 18:35:41,000 WARNING  [db-pool] Connection pool at 95% utilization
+2026-04-10 19:50:53,000 INFO     [request-700] GET /api/dashboard -> 200 (1200ms)
+2026-04-10 20:05:17,000 CRITICAL [security] Potential SQL injection attempt from 10.0.0.200
+2026-04-10 21:20:34,000 ERROR    [request-701] POST /api/webhooks -> Invalid signature
+2026-04-10 22:35:46,000 INFO     [scheduler] Nightly backup completed successfully
+2026-04-11 06:50:58,000 INFO     [main] Application starting up — version 3.14.3
+2026-04-11 07:15:21,000 DEBUG    [main] Configuration loaded from environment
+2026-04-11 08:30:37,000 INFO     [request-800] GET /api/health -> 200 (2ms)
+2026-04-11 09:45:49,000 WARNING  [memory] Memory usage at 85%
+2026-04-11 10:00:12,000 ERROR    [request-801] GET /api/external -> External API timeout
+2026-04-11 11:15:28,000 INFO     [request-802] POST /api/logs -> 201 (25ms)
+2026-04-11 12:30:44,000 DEBUG    [worker-6] Processing queue: 450 items remaining
+2026-04-11 13:45:56,000 INFO     [scheduler] Weekly report generated
+2026-04-11 14:00:18,000 WARNING  [cache] Redis connection unstable
+2026-04-11 15:15:32,000 ERROR    [auth] Rate limit exceeded for IP 203.0.113.1
+2026-04-11 16:30:47,000 INFO     [request-900] GET /api/metrics -> 200 (75ms)

@@ -1,0 +1,60 @@
+2026-04-10 08:00:00,001 INFO     [main] Application starting up — version 3.14.2
+2026-04-10 08:00:00,050 DEBUG    [main] Loading configuration from /etc/myapp/config.yaml
+2026-04-10 08:00:00,112 DEBUG    [main] Database host: db.internal:5432
+2026-04-10 08:00:00,200 INFO     [main] Connected to PostgreSQL database (pool size=10)
+2026-04-10 08:00:00,205 INFO     [main] Cache layer initialized (Redis 7.0 @ 10.0.0.8:6379)
+2026-04-10 08:00:00,210 INFO     [main] HTTP server listening on 0.0.0.0:8080
+2026-04-10 08:00:01,000 DEBUG    [worker-1] Worker thread started
+2026-04-10 08:00:01,001 DEBUG    [worker-2] Worker thread started
+2026-04-10 08:00:01,002 DEBUG    [worker-3] Worker thread started
+2026-04-10 08:00:01,003 DEBUG    [worker-4] Worker thread started
+2026-04-10 08:01:00,500 INFO     [request-101] GET /api/users -> 200 (12ms)
+2026-04-10 08:01:01,600 INFO     [request-102] POST /api/users -> 201 (34ms)
+2026-04-10 08:01:02,700 DEBUG    [request-102] Inserted user id=5042 into users table
+2026-04-10 08:01:05,000 WARNING  [request-103] POST /api/orders -> 422: missing required field 'shipping_address'
+2026-04-10 08:01:07,100 INFO     [request-104] GET /api/orders -> 200 (9ms)
+2026-04-10 08:01:08,200 ERROR    [request-105] GET /api/inventory -> Database query timeout after 5000ms
+2026-04-10 08:01:08,210 ERROR    [request-105] Stack trace:
+  at db.query (/app/lib/db.js:88)
+  at InventoryService.getAll (/app/services/inventory.js:22)
+  at router.get (/app/routes/inventory.js:10)
+2026-04-10 08:01:08,220 INFO     [request-105] GET /api/inventory -> 500 (5012ms)
+2026-04-10 08:01:10,000 WARNING  [db-pool] Connection pool utilization at 90% (9/10 connections in use)
+2026-04-10 08:01:15,000 INFO     [request-106] GET /api/inventory -> 200 (22ms)
+2026-04-10 08:02:00,000 DEBUG    [scheduler] Running scheduled job: cleanup_expired_sessions
+2026-04-10 08:02:00,250 INFO     [scheduler] Deleted 142 expired sessions
+2026-04-10 08:03:00,000 WARNING  [cache] Cache miss rate for /api/products exceeded 40% threshold (current: 43.2%)
+2026-04-10 08:03:11,100 INFO     [request-210] GET /api/products -> 200 (88ms, cache miss)
+2026-04-10 08:03:12,200 INFO     [request-211] GET /api/products -> 200 (4ms, cache hit)
+2026-04-10 08:03:12,300 INFO     [request-212] GET /api/products -> 200 (3ms, cache hit)
+2026-04-10 08:05:00,000 ERROR    [auth] Failed login attempt for user 'admin' from 10.0.0.99 (attempt 3/5)
+2026-04-10 08:05:01,000 ERROR    [auth] Failed login attempt for user 'admin' from 10.0.0.99 (attempt 4/5)
+2026-04-10 08:05:02,000 ERROR    [auth] Failed login attempt for user 'admin' from 10.0.0.99 (attempt 5/5)
+2026-04-10 08:05:02,100 WARNING  [auth] Account 'admin' temporarily locked after 5 failed attempts
+2026-04-10 08:05:03,000 WARNING  [security] Brute-force pattern detected from 10.0.0.99 — rate-limiting applied
+2026-04-10 08:06:00,000 INFO     [request-300] GET /api/report -> 200 (1402ms)
+2026-04-10 08:07:00,000 CRITICAL [db] Lost connection to primary database db.internal:5432
+2026-04-10 08:07:00,100 CRITICAL [db] Failing over to standby database db-standby.internal:5432
+2026-04-10 08:07:00,500 INFO     [db] Successfully connected to standby database
+2026-04-10 08:07:00,600 WARNING  [db] Operating in read-only mode until primary is restored
+2026-04-10 08:07:05,000 ERROR    [request-401] POST /api/users -> Cannot execute write on read-only database
+2026-04-10 08:07:05,100 INFO     [request-401] POST /api/users -> 503 (5ms)
+2026-04-10 08:07:10,000 ERROR    [request-402] POST /api/orders -> Cannot execute write on read-only database
+2026-04-10 08:07:10,100 INFO     [request-402] POST /api/orders -> 503 (4ms)
+2026-04-10 08:10:00,000 INFO     [db] Primary database connection restored
+2026-04-10 08:10:00,050 INFO     [db] Switched back to primary database db.internal:5432
+2026-04-10 08:10:00,100 INFO     [db] Write operations resumed
+2026-04-10 08:15:00,000 DEBUG    [scheduler] Running scheduled job: generate_daily_report
+2026-04-10 08:15:04,500 INFO     [scheduler] Daily report generated (2.3MB) and saved to /var/reports/2026-04-10.pdf
+2026-04-10 08:20:00,000 WARNING  [memory] Heap usage at 78% (1567MB / 2048MB)
+2026-04-10 08:20:00,100 DEBUG    [gc] Running full GC cycle
+2026-04-10 08:20:00,800 INFO     [gc] GC complete — freed 312MB, heap now at 62%
+2026-04-10 08:30:00,000 INFO     [main] Health check OK — uptime: 30m, requests: 1842, errors: 7
+2026-04-10 09:00:00,000 INFO     [main] Health check OK — uptime: 60m, requests: 5291, errors: 9
+2026-04-10 09:55:00,000 WARNING  [tls] TLS certificate for api.example.com expires in 14 days
+2026-04-10 10:00:00,000 INFO     [main] Health check OK — uptime: 120m, requests: 11042, errors: 12
+2026-04-10 11:30:00,000 ERROR    [request-9981] PUT /api/upload -> file too large (512MB > 100MB limit)
+2026-04-10 11:30:00,050 INFO     [request-9981] PUT /api/upload -> 413 (2ms)
+2026-04-10 11:45:00,000 CRITICAL [worker-2] Unhandled exception in worker thread — restarting
+2026-04-10 11:45:00,100 DEBUG    [worker-2] Worker thread restarted
+2026-04-10 12:00:00,000 INFO     [main] Health check OK — uptime: 240m, requests: 22118, errors: 14
