@@ -67,6 +67,9 @@ A standalone Python desktop application built with **PyQt6** for analyzing `.log
 - `parsing_searching.py` — parsing, searching, sorting
 - `analytics_reporting.py` — analytics and reporting
 - `sample_logs/` — sample files for testing
+- `test_analytics_reporting.py` — testing
+- `test_exporters.py` — testing
+- `test_parsing_searching.py` — testing
 
 ## Requirements
 - Python 3.10+
