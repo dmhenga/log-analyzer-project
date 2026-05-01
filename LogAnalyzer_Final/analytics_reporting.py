@@ -1,3 +1,15 @@
+"""Analytics and Reporting Module
+
+Requirements Coverage:
+- FR-5.1.1, FR-5.1.2, FR-5.1.3: Count analytics (total, by level, by source)
+- FR-5.1.4: Top recurring messages
+- FR-5.1.5: Time-based distribution
+- FR-5.1.6: Flagged entries (errors, warnings, keywords)
+- FR-6.1: HTML export
+- FR-6.2: CSV export
+- FR-6.3: Report content with summary statistics
+"""
+
 from __future__ import annotations
 
 import csv
@@ -11,44 +23,73 @@ from pathlib import Path
 
 @dataclass
 class SummaryResult:
-    total_entries: int
-    level_counts: dict[str, int]
-    source_counts: dict[str, int]
-    time_bucket_counts: dict[str, int]
+    """Container for analytics summary data.
+    
+    Implements: FR-5.1 (all sub-requirements)
+    """
+    total_entries: int  # FR-5.1.1
+    level_counts: dict[str, int]  # FR-5.1.2
+    source_counts: dict[str, int]  # FR-5.1.3
+    time_bucket_counts: dict[str, int]  # FR-5.1.5
 
 
 class AnalyticsEngine:
+    """Calculates analytics and statistics for log entries.
+    
+    Implements:
+    - FR-5.1.1: Total entry count
+    - FR-5.1.2: Log level distribution
+    - FR-5.1.3: Source file distribution
+    - FR-5.1.4: Top recurring messages
+    - FR-5.1.5: Time-based distribution
+    - FR-5.1.6: Flagged entries
+    """
     def summarize(self, entries: list[dict]) -> SummaryResult:
+        """Generate summary statistics for log entries.
+        
+        Implements: FR-5.1.1, FR-5.1.2, FR-5.1.3, FR-5.1.5
+        """
         level_counts = Counter()
         source_counts = Counter()
         time_bucket_counts = defaultdict(int)
 
         for entry in entries:
+            # FR-5.1.2: Count by log level
             level = (entry.get("level") or "UNKNOWN").upper()
+            # FR-5.1.3: Count by source file
             source = entry.get("source_file") or "UNKNOWN"
             timestamp = entry.get("timestamp")
 
             level_counts[level] += 1
             source_counts[source] += 1
 
+            # FR-5.1.5: Time-based distribution (hourly buckets)
             if timestamp:
                 bucket = self._time_bucket(timestamp)
                 if bucket:
                     time_bucket_counts[bucket] += 1
 
         return SummaryResult(
-            total_entries=len(entries),
+            total_entries=len(entries),  # FR-5.1.1
             level_counts=dict(level_counts),
             source_counts=dict(source_counts),
             time_bucket_counts=dict(time_bucket_counts),
         )
 
     def top_messages(self, entries: list[dict], top_n: int = 10) -> list[tuple[str, int]]:
+        """Identify most frequently occurring messages.
+        
+        Implements: FR-5.1.4 - Top recurring messages
+        """
         normalized = [self._normalize_message(e.get("message", "")) for e in entries if e.get("message")]
         counts = Counter(normalized)
         return counts.most_common(top_n)
 
     def flag_entries(self, entries: list[dict]) -> list[dict]:
+        """Identify entries matching flagging criteria.
+        
+        Implements: FR-5.1.6 - Flagged entries (errors, warnings, keywords)
+        """
         flagged = []
         keywords = ["timeout", "failed", "exception", "denied"]
 
@@ -56,10 +97,12 @@ class AnalyticsEngine:
             level = (entry.get("level") or "").upper()
             msg = (entry.get("message") or "").lower()
 
+            # FR-5.1.6: Flag ERROR and CRITICAL level entries
             if level in {"ERROR", "CRITICAL"}:
                 flagged.append(entry)
                 continue
 
+            # FR-5.1.6: Flag entries containing specific keywords
             if any(k in msg for k in keywords):
                 flagged.append(entry)
 
@@ -88,6 +131,10 @@ class AnalyticsEngine:
 
 
 class ReportBuilder:
+    """Builds structured report data.
+    
+    Implements: FR-6.3 - Report content with summary statistics
+    """
     def build_report(
         self,
         entries: list[dict],
@@ -96,6 +143,10 @@ class ReportBuilder:
         flagged_entries: list[dict],
         loaded_files: list[str],
     ) -> dict:
+        """Build complete report structure.
+        
+        Implements: FR-6.3 - Include summary statistics and entry details
+        """
         return {
             "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "loaded_files": loaded_files,
@@ -140,7 +191,17 @@ class ReportBuilder:
 
 
 class HtmlExporter:
+    """Exports log data and analytics to HTML format.
+    
+    Implements:
+    - FR-6.1: Export filtered results to HTML format
+    - FR-6.3: Include summary statistics and entry details
+    """
     def export(self, report: dict, output_path: str) -> None:
+        """Generate HTML report file.
+        
+        Implements: FR-6.1, FR-6.3
+        """
         summary: SummaryResult = report["summary"]
         top_messages = report["top_messages"]
         flagged_entries = report["flagged_entries"]
@@ -184,7 +245,15 @@ class HtmlExporter:
 
 
 class CsvExporter:
+    """Exports log entries to CSV format.
+    
+    Implements: FR-6.2 - Export filtered results to CSV format
+    """
     def export(self, entries: list[dict], output_path: str) -> None:
+        """Write log entries to CSV file.
+        
+        Implements: FR-6.2
+        """
         with open(output_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(
                 f,

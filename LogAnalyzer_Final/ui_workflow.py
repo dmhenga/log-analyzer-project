@@ -1,3 +1,16 @@
+"""User Interface Workflow Module
+
+Requirements Coverage:
+- NFR-2.1: Graphical User Interface (GUI)
+- NFR-2.2: Clear error messages
+- NFR-2.3: Progress indicators
+- FR-1.1: File import (via file dialogs)
+- FR-3.x: Search and filter (UI controls)
+- FR-4.x: Sorting (UI controls)
+- FR-5.x: Analytics display
+- FR-6.1, FR-6.2: Export functionality
+"""
+
 import sys
 from pathlib import Path
 
@@ -70,12 +83,20 @@ def _watermark(ax):
     )
 
 
-# Main window 
+# Main window
 class MainWindow(QMainWindow):
+    """Main application window.
+    
+    Implements:
+    - NFR-2.1: Graphical user interface
+    - NFR-2.2: Error messages
+    - NFR-2.3: Status indicators
+    - All functional requirements through UI controls
+    """
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("LARG — Log Analyzer & Report Generator")
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(900, 600)  # NFR-2.1: Minimum resolution 900x600
 
         self._entries: list[dict] = []
         self._loaded_files: list[str] = []
@@ -598,22 +619,41 @@ class MainWindow(QMainWindow):
 
         return widget
 
-    # Status bar 
+    # Status bar
     def _build_statusbar(self):
+        """Build status bar for operation feedback.
+        
+        Implements: NFR-2.3 - Progress indicators
+        """
         self._statusbar = QStatusBar()
         self.setStatusBar(self._statusbar)
         self._set_status("Ready.")
 
     def _set_status(self, msg: str):
+        """Update status bar message.
+        
+        Implements: NFR-2.3 - Display progress indicators
+        """
         self._statusbar.showMessage(msg)
 
-    # Slots 
+    # Slots
     def _on_load_files(self):
+        """Handle file import action.
+        
+        Implements:
+        - FR-1.1: Import one or more log files
+        - FR-1.2, FR-1.3: File format validation
+        - FR-2.1: Parsing mode selection
+        - NFR-2.2: Error messages for invalid inputs
+        - NFR-2.3: Status updates
+        - NFR-3.1: Graceful error handling
+        """
+        # FR-1.1: File dialog for importing one or more files
         paths, _ = QFileDialog.getOpenFileNames(
             self,
             "Open Log Files",
             "",
-            "Log Files (*.log *.txt);;All Files (*)",
+            "Log Files (*.log *.txt);;All Files (*)",  # FR-1.2: .log and .txt formats
         )
         if not paths:
             return
@@ -626,17 +666,21 @@ class MainWindow(QMainWindow):
         names = ", ".join(Path(p).name for p in paths)
         self._loaded_label.setText(f"{len(paths)} file(s): {names}")
 
+        # FR-2.1: Apply selected parsing mode
         mode = self._parse_mode_combo.currentText()
         try:
             manager = LogManager()
             self._entries = manager.parse_files(paths, mode=mode)
-            self._flagged = self._analytics.flag_entries(self._entries)
+            self._flagged = self._analytics.flag_entries(self._entries)  # FR-5.1.6
             self._refresh_ui()
+            # NFR-2.3: Display operation status
             self._set_status(
                 f"Loaded {len(paths)} file(s) — {len(self._entries)} entries, "
                 f"{len(self._flagged)} flagged."
             )
         except Exception as exc:
+            # NFR-2.2: Clear error message for parse errors
+            # NFR-3.1: Graceful error handling
             QMessageBox.critical(self, "Parse Error", str(exc))
             self._set_status("Error during parsing.")
 
@@ -656,6 +700,16 @@ class MainWindow(QMainWindow):
         self._refresh_summary()
 
     def _refresh_summary(self):
+        """Update analytics summary and display.
+        
+        Implements:
+        - FR-5.1.1: Total entry count
+        - FR-5.1.2: Log level distribution
+        - FR-5.1.3: Source file distribution
+        - FR-5.1.4: Top recurring messages
+        - FR-5.1.5: Time-based distribution
+        - FR-5.1.6: Flagged entries display
+        """
         if not self._entries:
             # update stat cards with zeros, todo: test and double check...
             self._card_total.set_value("0")
@@ -670,6 +724,7 @@ class MainWindow(QMainWindow):
         # enhanced entries with extracted levels from messages
         enhanced_entries = _enhance_entries_with_extracted_levels(self._entries)
         
+        # FR-5.1.1, FR-5.1.2, FR-5.1.3, FR-5.1.5: Calculate summary statistics
         summary = self._analytics.summarize(enhanced_entries)
         # enhanced summary with HTTP status codes if present
         summary = _enhance_summary_with_http_status(summary, enhanced_entries)
@@ -695,16 +750,22 @@ class MainWindow(QMainWindow):
         self._refresh_charts(summary, top_msgs)
 
     def _on_search(self):
+        """Handle search action.
+        
+        Implements: FR-3.1 - Keyword filtering
+        """
         keyword = self._search_input.text().strip()
         if not keyword:
             _populate_table(self._entries_table, self._entries)
             return
         try:
             engine = SearchEngine()
+            # FR-3.1: Apply keyword filter
             results = engine.search_logs(self._entries, QuerySpec(keyword=keyword))
             _populate_table(self._entries_table, results)
             self._set_status(f"Search: {len(results)} result(s) for '{keyword}'.")
         except Exception as exc:
+            # NFR-2.2: Error message for search errors
             QMessageBox.warning(self, "Search Error", str(exc))
 
     def _on_clear_search(self):
@@ -713,20 +774,35 @@ class MainWindow(QMainWindow):
         self._set_status("Search cleared.")
 
     def _on_sort(self):
+        """Handle sort action.
+        
+        Implements:
+        - FR-4.1: Sort by timestamp, level, message, or source_file
+        - FR-4.2: Ascending and descending sort orders
+        """
         key = self._sort_combo.currentText()
-        reverse = self._sort_order_combo.currentIndex() == 1
+        reverse = self._sort_order_combo.currentIndex() == 1  # FR-4.2: Descending order
         try:
             engine = SearchEngine()
+            # FR-4.1, FR-4.2: Apply sort specification
             sorted_entries = engine.sort_logs(self._entries, SortSpec(key=key, reverse=reverse))
             _populate_table(self._entries_table, sorted_entries)
             self._set_status(f"Sorted by '{key}' ({'desc' if reverse else 'asc'}).")
         except Exception as exc:
+            # NFR-2.2: Error message for sort errors
             QMessageBox.warning(self, "Sort Error", str(exc))
 
     def _on_export_html(self):
+        """Handle HTML export action.
+        
+        Implements:
+        - FR-6.1: Export filtered results to HTML format
+        - FR-6.3: Include summary statistics and entry details
+        """
         if not self._loaded_files:
             QMessageBox.information(self, "Export", "No files loaded. Load files first.")
             return
+        # FR-6.1: File dialog for HTML export
         path, _ = QFileDialog.getSaveFileName(
             self, "Export HTML Report", "report.html", "HTML Files (*.html)"
         )
@@ -748,19 +824,26 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Export Error", str(exc))
 
     def _on_export_csv(self):
+        """Handle CSV export action.
+        
+        Implements: FR-6.2 - Export filtered results to CSV format
+        """
         if not self._loaded_files:
             QMessageBox.information(self, "Export", "No files loaded. Load files first.")
             return
+        # FR-6.2: File dialog for CSV export
         path, _ = QFileDialog.getSaveFileName(
             self, "Export CSV", "entries.csv", "CSV Files (*.csv)"
         )
         if not path:
             return
         try:
+            # FR-6.2: Export entries to CSV format
             self._csv_exporter.export(self._entries, path)
             QMessageBox.information(self, "Export", f"CSV saved to:\n{path}")
             self._set_status(f"CSV exported → {path}")
         except Exception as exc:
+            # NFR-2.2: Error message for export errors
             QMessageBox.critical(self, "Export Error", str(exc))
 
 
